@@ -1,0 +1,6 @@
+---
+
+hostname: dlabstest.dev
+ip: 192.0.0.123
+memory: 4092
+cpus: 4

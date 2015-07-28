@@ -1,0 +1,49 @@
+---
+
+- name: copy pgdg.list to /etc/apt/sources.list.d/pgdg.list
+  copy: src=pgdg.list dest=/etc/apt/sources.list.d/pgdg.list
+  sudo: yes
+
+- name: sign postgres repository
+  sudo: yes
+  shell: wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
+
+- name: update apt cache
+  sudo: yes
+  apt: update_cache=yes
+
+- name: install postgresql packages
+  sudo: yes
+  apt: pkg={{ item }} state=present
+  with_items:
+    - libpq-dev
+    - postgresql-9.4
+    - postgresql-contrib-9.4
+    - python-psycopg2
+
+- name: modify postgresql.conf
+  sudo: yes
+  lineinfile: dest=/etc/postgresql/9.4/main/postgresql.conf line="listen_addresses = '*'"
+
+- name: modify pg_hba.conf
+  sudo: yes
+  lineinfile: dest=/etc/postgresql/9.4/main/pg_hba.conf line="host all all 0.0.0.0/0 md5"
+
+- name: ensure postgresql is running
+  sudo: yes
+  service: name=postgresql state=restarted
+
+- name: create postgresql database
+  sudo: yes
+  sudo_user: postgres
+  postgresql_db: name=vagrant encoding='UTF-8' state=present
+
+- name: create postgresql user
+  sudo: yes
+  sudo_user: postgres
+  postgresql_user: db=vagrant name=vagrant password=vagrant role_attr_flags=SUPERUSER state=present
+
+- name: grant privileges to user for postgresql database
+  sudo: yes
+  sudo_user: postgres
+  postgresql_privs: db=vagrant privs=ALL type=database obj=vagrant role=vagrant

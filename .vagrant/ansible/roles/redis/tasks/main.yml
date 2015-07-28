@@ -1,0 +1,11 @@
+---
+
+- name: install redis
+  sudo: yes
+  apt: pkg=redis-server state=present
+
+- name: copy redis.conf to /etc/redis/redis.conf
+  copy: src=redis.conf dest=/etc/redis/redis.conf
+  sudo: yes
+  notify:
+    - restart redis

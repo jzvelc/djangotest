@@ -1,0 +1,18 @@
+{
+  "dependencies": {
+    "q": "^1.1.2",
+    "redis": "^0.12.1",
+    "socket.io": "^1.2.1",
+    "socket.io-redis": "^0.1.4",
+    "traceur": "0.0.79",
+    "winston": "^0.8.3"
+  },
+  "devDependencies": {
+    "gulp": "^3.8.10",
+    "gulp-develop-server": "^0.2.5",
+    "gulp-jshint": "^1.9.0"
+  },
+  "app": {
+    "port": 8002
+  }
+}

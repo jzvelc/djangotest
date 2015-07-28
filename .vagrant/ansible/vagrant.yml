@@ -1,0 +1,8 @@
+---
+
+- hosts: vagrant
+  roles:
+    - common
+    - postgresql
+    - redis
+

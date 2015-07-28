@@ -1,0 +1,46 @@
+---
+
+- name: install common packages
+  sudo: yes
+  apt: pkg={{ item }} state=present
+  with_items:
+    - git
+    - curl
+    - build-essential
+    - libyaml-dev
+    - libssl-dev
+    - libjpeg-dev
+    - zlib1g-dev
+
+- name: update locale
+  sudo: yes
+  shell: /usr/sbin/update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
+
+- name: set permissions for shell scripts
+  file: path={{ item }} mode=0755
+  with_fileglob:
+    - "/vagrant/.vagrant/ansible/roles/*/files/*.sh"
+    - "/vagrant/.bin/*.sh"
+
+- name: set permission for manage.py
+  file: path=/vagrant/manage.py mode=0755
+
+- name: ensure /etc/profile.d folder exists
+  sudo: yes
+  file: path=/etc/profile.d state=directory owner=root group=root mode=0775
+
+- stat: path=/vagrant/.env.local
+  register: localenv
+
+- name: copy .env to /etc/profile.d
+  sudo: yes
+  copy: src=/vagrant/.env dest=/etc/profile.d/env.sh owner=root group=root mode=0775
+  when: localenv.stat.exists == False
+
+- name: copy .env.local to /etc/profile.d
+  sudo: yes
+  copy: src=/vagrant/.env.local dest=/etc/profile.d/env.sh owner=root group=root mode=0775
+  when: localenv.stat.exists == True
+
+- name: change workdir in ~/.profile
+  lineinfile: dest=~/.profile line="cd /vagrant"
